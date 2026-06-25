@@ -46,21 +46,80 @@ class ToolsManager:
     def _check_lua_installed(self) -> bool:
         """Check if Lua is installed"""
         try:
-            cmd = ["which", "lua"] if self.system != "Windows" else ["where", "lua"]
-            result = subprocess.run(cmd, capture_output=True, text=True)
-            if result.returncode == 0:
-                return True
-            
-            # Check common paths
+            # First check using command line
             if self.system == "Windows":
-                paths = [
+                # Check using where command
+                result = subprocess.run(["where", "lua"], capture_output=True, text=True)
+                if result.returncode == 0 and result.stdout.strip():
+                    return True
+                
+                # Check common Windows installation paths for Lua
+                lua_paths = [
                     r"C:\Program Files\Lua\5.4\lua.exe",
-                    r"C:\Program Files (x86)\Lua\5.4\lua.exe"
+                    r"C:\Program Files (x86)\Lua\5.4\lua.exe",
+                    r"C:\Lua\lua.exe",
+                    os.path.expanduser(r"~\AppData\Local\Lua\lua.exe"),
+                    os.path.expanduser(r"~\scoop\apps\lua\current\lua.exe"),
+                    os.path.expanduser(r"~\AppData\Roaming\Lua\lua.exe"),
                 ]
-                return any(os.path.exists(p) for p in paths)
+                
+                # Also check for luajit
+                luajit_paths = [
+                    r"C:\Program Files\LuaJIT\luajit.exe",
+                    r"C:\Program Files (x86)\LuaJIT\luajit.exe",
+                ]
+                
+                all_paths = lua_paths + luajit_paths
+                
+                if any(os.path.exists(p) for p in all_paths):
+                    return True
+                
+                # Check registry for Lua installation (Windows)
+                try:
+                    import winreg
+                    # Check common registry keys for Lua
+                    registry_keys = [
+                        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Lua"),
+                        (winreg.HKEY_CURRENT_USER, r"SOFTWARE\Lua"),
+                        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Wow6432Node\Lua"),
+                    ]
+                    
+                    for hkey, path in registry_keys:
+                        try:
+                            key = winreg.OpenKey(hkey, path)
+                            winreg.CloseKey(key)
+                            return True
+                        except FileNotFoundError:
+                            continue
+                except Exception:
+                    pass  # Registry check failed, continue with other checks
+                    
             else:
-                paths = ["/usr/bin/lua", "/usr/local/bin/lua"]
-                return any(os.path.exists(p) for p in paths)
+                # Unix-like systems (Linux/macOS)
+                result = subprocess.run(["which", "lua"], capture_output=True, text=True)
+                if result.returncode == 0 and result.stdout.strip():
+                    return True
+                
+                # Check common Unix paths
+                unix_paths = ["/usr/bin/lua", "/usr/local/bin/lua", "/opt/homebrew/bin/lua"]
+                if any(os.path.exists(p) for p in unix_paths):
+                    return True
+            
+            # Final fallback: try to run lua -v
+            try:
+                result = subprocess.run(
+                    ["lua", "-v"], 
+                    capture_output=True, 
+                    text=True, 
+                    timeout=5
+                )
+                if result.returncode == 0:
+                    return True
+            except Exception:
+                pass
+            
+            return False
+            
         except Exception:
             return False
     

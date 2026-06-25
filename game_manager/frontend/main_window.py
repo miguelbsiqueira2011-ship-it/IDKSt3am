@@ -256,21 +256,21 @@ class MainWindow(ctk.CTk):
         games_scroll_frame = ctk.CTkScrollableFrame(
             parent,
             fg_color="transparent",
-            height=300
+            height=350
         )
-        games_scroll_frame.pack(fill="both", expand=True)
+        games_scroll_frame.pack(fill="both", expand=True, pady=(10, 0))
         
         # Get all games sorted alphabetically
         all_games = self.game_service.search_games("")
         
-        # Create cards for each game
+        # Create cards for each game with add button
         for game in all_games:
             card = GameCard(
                 games_scroll_frame,
                 game_data=game,
-                on_select=self._on_game_select
+                on_add=self._on_add_game_direct  # Direct add callback
             )
-            card.pack(fill="x", pady=3)
+            card.pack(fill="x", pady=5)
     
     def _setup_results_section(self, parent) -> None:
         """Setup the search results section"""
@@ -501,15 +501,37 @@ class MainWindow(ctk.CTk):
                 # Get filtered games
                 games = self.game_service.search_games(query)
                 
-                # Display filtered games
+                # Display filtered games with add buttons
                 for game in games:
                     card = GameCard(
                         widget,
                         game_data=game,
-                        on_select=self._on_game_select
+                        on_add=self._on_add_game_direct
                     )
-                    card.pack(fill="x", pady=3)
+                    card.pack(fill="x", pady=5)
                 break
+    
+    def _on_add_game_direct(self, game: Dict[str, Any]) -> None:
+        """Handle direct add from game card button"""
+        self.selected_game = game
+        self._start_add_process()
+    
+    def _start_add_process(self) -> None:
+        """Start the add to library process"""
+        if not self.selected_game:
+            return
+        
+        # Hide the games list, show progress
+        for widget in self.main_frame.winfo_children():
+            if isinstance(widget, ctk.CTkScrollableFrame):
+                widget.pack_forget()
+                break
+        
+        self.progress_frame.grid()
+        
+        # Run addition in background thread
+        thread = threading.Thread(target=self._add_game_thread, daemon=True)
+        thread.start()
     
     def _on_game_select(self, game: Dict[str, Any], is_selected: bool) -> None:
         """Handle game selection from results"""
@@ -552,6 +574,42 @@ class MainWindow(ctk.CTk):
     def _on_select_game(self) -> None:
         """Legacy method - no longer needed as selection is immediate"""
         pass
+    
+    def _reset_to_search(self) -> None:
+        """Reset UI to initial search state"""
+        self.success_frame.grid_remove()
+        self.progress_frame.grid_remove()
+        
+        # Recreate the games list if it was removed
+        content_frame = None
+        for widget in self.main_frame.winfo_children():
+            if isinstance(widget, ctk.CTkScrollableFrame):
+                content_frame = widget
+                break
+        
+        if content_frame is None:
+            # Need to recreate the search section
+            self._recreate_search_section()
+        
+        self.selected_game = None
+    
+    def _recreate_search_section(self) -> None:
+        """Recreate the search section with games list"""
+        # Find the content area and recreate search
+        for row in range(self.main_frame.grid_size()[1]):
+            for col in range(self.main_frame.grid_size()[0]):
+                widget = self.main_frame.grid_slaves(row=row, column=col)
+                if widget and isinstance(widget[0], ctk.CTkFrame) and not isinstance(widget[0], ctk.CTkScrollableFrame):
+                    # This might be the search frame
+                    for child in widget[0].winfo_children():
+                        if isinstance(child, ctk.CTkFrame) and hasattr(child, 'pack_slaves'):
+                            # Found a container, recreate games here
+                            self._show_all_games(child)
+                            return
+        
+        # Fallback: just reload the app state
+        self.search_box.pack(fill="x", pady=(0, 20))
+        self._show_all_games(self.main_frame)
     
     def _on_add_to_library(self) -> None:
         """Handle add to library action"""
@@ -619,18 +677,65 @@ class MainWindow(ctk.CTk):
     def _on_later(self) -> None:
         """Handle do later action"""
         self._add_history_entry("Operação concluída (Steam não reiniciada)", True)
-        self._reset_to_search()
+        self._reset_to_search_v2()
     
-    def _reset_to_search(self) -> None:
-        """Reset UI to initial search state"""
+    def _reset_to_search_v2(self) -> None:
+        """Reset UI to initial search state - improved version"""
         self.success_frame.grid_remove()
+        self.progress_frame.grid_remove()
+        self.selected_frame.grid_remove()
         
-        # Show search again
-        self.search_box.pack(fill="x", pady=(0, 20))
-        self.select_btn.pack(fill="x")
-        self.search_box.clear()
+        # Find and remove any existing scrollable frames
+        for widget in self.main_frame.winfo_children():
+            if isinstance(widget, ctk.CTkScrollableFrame):
+                widget.destroy()
+        
+        # Recreate the search section properly
+        # Find the content frame (row 1)
+        content_widgets = self.main_frame.grid_slaves(row=1, column=0)
+        if content_widgets:
+            content_frame = content_widgets[0]
+        else:
+            # Create new content frame
+            content_frame = ctk.CTkScrollableFrame(
+                self.main_frame,
+                fg_color="transparent"
+            )
+            content_frame.grid(row=1, column=0, sticky="nsew")
+            content_frame.grid_columnconfigure(0, weight=1)
+        
+        # Clear content frame
+        for widget in content_frame.winfo_children():
+            widget.destroy()
+        
+        # Recreate search section
+        search_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
+        search_frame.grid(row=0, column=0, sticky="ew", pady=(20, 10))
+        
+        question_label = ctk.CTkLabel(
+            search_frame,
+            text="Qual jogo deseja adicionar?",
+            font=(self.theme.FONTS["family"], self.theme.FONTS["size_heading"]),
+            text_color=self.theme.COLORS["text_primary"]
+        )
+        question_label.pack(pady=(0, 15))
+        
+        self.search_box = SearchBox(
+            search_frame,
+            placeholder="Filtrar jogos...",
+            command=self._on_search,
+            height=45
+        )
+        self.search_box.pack(fill="x", pady=(0, 15))
+        
+        # Show all games
+        self._show_all_games(search_frame)
         
         self.selected_game = None
+    
+    def _reset_to_search(self) -> None:
+        """Legacy reset method - redirects to v2"""
+        self._reset_to_search_v2()
     
     def _toggle_history(self) -> None:
         """Toggle history panel"""
