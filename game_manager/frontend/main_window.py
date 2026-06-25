@@ -145,8 +145,8 @@ class MainWindow(ctk.CTk):
     def _setup_window(self) -> None:
         """Configure main window properties"""
         self.title("Game Manager")
-        self.geometry("1000x700")
-        self.minsize(800, 600)
+        self.geometry("800x600")  # Smaller window size
+        self.minsize(700, 550)
         
         # Configure appearance
         ctk.set_appearance_mode("dark")
@@ -225,9 +225,9 @@ class MainWindow(ctk.CTk):
         self._setup_success_section(content_frame)
     
     def _setup_search_section(self, parent) -> None:
-        """Setup the search section"""
+        """Setup the search section - shows all games immediately"""
         search_frame = ctk.CTkFrame(parent, fg_color="transparent")
-        search_frame.grid(row=0, column=0, sticky="ew", pady=40)
+        search_frame.grid(row=0, column=0, sticky="ew", pady=(20, 10))
         
         # Main question
         question_label = ctk.CTkLabel(
@@ -236,25 +236,41 @@ class MainWindow(ctk.CTk):
             font=(self.theme.FONTS["family"], self.theme.FONTS["size_heading"]),
             text_color=self.theme.COLORS["text_primary"]
         )
-        question_label.pack(pady=(0, 20))
+        question_label.pack(pady=(0, 15))
         
-        # Search box
+        # Search box (for filtering only)
         self.search_box = SearchBox(
             search_frame,
-            placeholder="Pesquisar jogo...",
+            placeholder="Filtrar jogos...",
             command=self._on_search,
-            height=50
+            height=45
         )
-        self.search_box.pack(fill="x", pady=(0, 20))
+        self.search_box.pack(fill="x", pady=(0, 15))
         
-        # Select button
-        self.select_btn = ActionButton(
-            search_frame,
-            text="Selecionar Jogo",
-            command=self._on_select_game,
-            style="secondary"
+        # Show all games immediately
+        self._show_all_games(search_frame)
+    
+    def _show_all_games(self, parent) -> None:
+        """Display all available games in a scrollable list"""
+        # Create scrollable frame for game list
+        games_scroll_frame = ctk.CTkScrollableFrame(
+            parent,
+            fg_color="transparent",
+            height=300
         )
-        self.select_btn.pack(fill="x")
+        games_scroll_frame.pack(fill="both", expand=True)
+        
+        # Get all games sorted alphabetically
+        all_games = self.game_service.search_games("")
+        
+        # Create cards for each game
+        for game in all_games:
+            card = GameCard(
+                games_scroll_frame,
+                game_data=game,
+                on_select=self._on_game_select
+            )
+            card.pack(fill="x", pady=3)
     
     def _setup_results_section(self, parent) -> None:
         """Setup the search results section"""
@@ -474,34 +490,37 @@ class MainWindow(ctk.CTk):
             pass
     
     def _on_search(self, query: str) -> None:
-        """Handle search action"""
-        # Show results frame
-        self.results_frame.grid()
-        
-        # Clear previous results
-        for widget in self.results_container.winfo_children():
-            widget.destroy()
-        
-        # Search for games
-        games = self.game_service.search_games(query)
-        
-        # Display results
-        for game in games:
-            card = GameCard(
-                self.results_container,
-                game_data=game,
-                on_select=self._on_game_select
-            )
-            card.pack(fill="x", pady=5)
+        """Handle search/filter action - update game list in place"""
+        # Find the scrollable frame with games
+        for widget in self.main_frame.winfo_children():
+            if isinstance(widget, ctk.CTkScrollableFrame):
+                # Clear current games
+                for child in widget.winfo_children():
+                    child.destroy()
+                
+                # Get filtered games
+                games = self.game_service.search_games(query)
+                
+                # Display filtered games
+                for game in games:
+                    card = GameCard(
+                        widget,
+                        game_data=game,
+                        on_select=self._on_game_select
+                    )
+                    card.pack(fill="x", pady=3)
+                break
     
     def _on_game_select(self, game: Dict[str, Any], is_selected: bool) -> None:
         """Handle game selection from results"""
         if is_selected:
-            # Deselect other cards
-            for widget in self.results_container.winfo_children():
-                if hasattr(widget, 'game_data') and widget.game_data != game:
-                    widget.is_selected = False
-                    widget._update_appearance()
+            # Deselect other cards - search in all parent frames
+            for frame in self.main_frame.winfo_children():
+                if isinstance(frame, (ctk.CTkFrame, ctk.CTkScrollableFrame)):
+                    for widget in frame.winfo_children():
+                        if hasattr(widget, 'game_data') and widget.game_data != game:
+                            widget.is_selected = False
+                            widget._update_appearance()
             
             self.selected_game = game
             self._show_selected_game()
@@ -521,18 +540,18 @@ class MainWindow(ctk.CTk):
             text=f"{' • '.join(genres)} | ★ {rating}"
         )
         
-        # Hide results, show selected
-        self.results_frame.grid_remove()
-        self.search_box.pack_forget()
-        self.select_btn.pack_forget()
+        # Hide the games list container, show selected
+        # Find and hide the scrollable frame with games
+        for widget in self.main_frame.winfo_children():
+            if isinstance(widget, ctk.CTkScrollableFrame):
+                widget.pack_forget()
+                break
         
         self.selected_frame.grid()
     
     def _on_select_game(self) -> None:
-        """Handle select game button click"""
-        query = self.search_box.get()
-        if query:
-            self._on_search(query)
+        """Legacy method - no longer needed as selection is immediate"""
+        pass
     
     def _on_add_to_library(self) -> None:
         """Handle add to library action"""

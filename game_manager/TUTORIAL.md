@@ -220,7 +220,7 @@ Após instalar as ferramentas:
 
 ### Tela Inicial
 
-Ao abrir o Game Manager, você verá:
+Ao abrir o Game Manager (via `run.bat` no Windows), você verá:
 
 ```
 ┌─────────────────────────────────────┐
@@ -229,33 +229,44 @@ Ao abrir o Game Manager, você verá:
 │                                     │
 │     Qual jogo deseja adicionar?     │
 │                                     │
-│  🔍 [Pesquisar jogo...]             │
+│  🔍 [Filtrar jogos...]              │
 │                                     │
-│  [      Selecionar Jogo      ]      │
+│  ┌───────────────────────────────┐  │
+│  │ ▸ Baldur's Gate 3             │  │
+│  │ ▸ Battlefield 2042            │  │
+│  │ ▸ Call of Duty: MW II         │  │
+│  │ ▸ Counter-Strike 2            │  │
+│  │ ▸ Cyberpunk 2077              │  │
+│  │ ▸ Elden Ring                  │  │
+│  │ ▸ God of War                  │  │
+│  │ ▸ Minecraft                   │  │
+│  │ ▸ Red Dead Redemption 2       │  │
+│  │ ▸ The Witcher 3               │  │
+│  └───────────────────────────────┘  │
 │                                     │
 ├─────────────────────────────────────┤
 │  Steam        ● Online              │
-│  Integração 1 ● Online              │
-│  Integração 2 ● Online              │
+│  Lua Tools    ● Online              │
 │                        📜 Histórico │
 └─────────────────────────────────────┘
 ```
 
 ### Adicionando seu Primeiro Jogo
 
-#### Passo 1: Pesquisar
-1. Digite o nome do jogo no campo de pesquisa
-2. Pressione **Enter** ou clique em **"Selecionar Jogo"**
+#### Passo 1: Escolher o Jogo (SEM DIGITAR!)
+1. **Todos os jogos já aparecem listados** na tela inicial
+2. A lista está em **ordem alfabética**
+3. Basta **clicar no card do jogo** que você deseja
+4. Se quiser filtrar, digite no campo "Filtrar jogos..."
 
-#### Passo 2: Selecionar
-1. Os resultados aparecerão abaixo
-2. Clique no card do jogo desejado
-3. O card ficará destacado (borda azul)
+#### Passo 2: Confirmar Seleção
+1. Ao clicar, o card fica destacado (fundo mais claro)
+2. As informações do jogo são exibidas abaixo
+3. Verifique se é o jogo correto
 
-#### Passo 3: Confirmar
-1. As informações do jogo serão exibidas
-2. Verifique se é o jogo correto
-3. Clique em **"Adicionar à Biblioteca"**
+#### Passo 3: Adicionar à Biblioteca
+1. Clique em **"Adicionar à Biblioteca"** (botão grande e destacado)
+2. Uma barra de progresso aparecerá
 
 #### Passo 4: Aguardar Processamento
 ```
@@ -273,6 +284,34 @@ Operação concluída com sucesso.
 ```
 
 **Recomendação:** Clique em **"Reiniciar Steam"** para garantir que a biblioteca seja atualizada corretamente.
+
+### Lista Completa de Jogos Disponíveis
+
+A aplicação já inclui **21 jogos populares** prontos para seleção:
+
+- Baldur's Gate 3
+- Battlefield 2042
+- Call of Duty: Modern Warfare II
+- Counter-Strike 2
+- Cyberpunk 2077
+- Destiny 2
+- Elden Ring
+- FIFA 23
+- Forza Horizon 5
+- God of War
+- Grand Theft Auto V
+- Hogwarts Legacy
+- Left 4 Dead 2
+- Minecraft
+- Red Dead Redemption 2
+- Resident Evil 4
+- Rocket League
+- Spider-Man Remastered
+- Starfield
+- The Witcher 3: Wild Hunt
+- Valorant
+
+> 💡 **Dica:** Não é necessário digitar o nome do jogo! Basta rolar a lista e clicar no que você quer. Use o filtro apenas se desejar buscar um jogo específico rapidamente.
 
 ---
 

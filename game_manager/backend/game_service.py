@@ -14,35 +14,199 @@ class GameService:
         self.api_base = "https://api.igdb.com/v4"
         self.selected_game: Optional[Dict[str, Any]] = None
         
-    def search_games(self, query: str) -> List[Dict[str, Any]]:
-        """Search for games using IGDB API (with fallback to mock data)"""
-        try:
-            # Try to use IGDB API if credentials are available
-            headers = {
-                'Client-ID': 'your_client_id',  # Replace with actual client ID
-                'Authorization': 'Bearer your_token'  # Replace with actual token
-            }
-            
-            # Search endpoint
-            response = requests.post(
-                f"{self.api_base}/games",
-                headers=headers,
-                data=f'search "{query}"; fields name, cover.url, release_dates, genres, rating;',
-                timeout=5
-            )
-            
-            if response.status_code == 200:
-                games_data = response.json()
-                if games_data:
-                    return self._parse_igdb_results(games_data[:5])
-        except Exception:
-            pass  # Fall back to mock data
+    def search_games(self, query: str = "") -> List[Dict[str, Any]]:
+        """Return ALL games in alphabetical order - no search needed"""
+        # Always return all games sorted alphabetically
+        all_games = self._get_all_games()
         
-        # Return mock data for demonstration
-        return self._get_mock_games(query)
+        # If query is provided, filter (but still show all if empty)
+        if query and query.strip():
+            query_lower = query.lower().strip()
+            filtered = [
+                game for game in all_games 
+                if query_lower in game["name"].lower()
+            ]
+            if filtered:
+                return filtered
+        
+        # Return all games sorted alphabetically
+        return sorted(all_games, key=lambda x: x["name"])
+    
+    def _get_all_games(self) -> List[Dict[str, Any]]:
+        """Get complete list of popular games"""
+        return [
+            {
+                "id": 1,
+                "name": "Baldur's Gate 3",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co6r0s.jpg",
+                "release_date": "2023-08-03",
+                "genres": ["RPG", "Strategy"],
+                "rating": 96
+            },
+            {
+                "id": 2,
+                "name": "Battlefield 2042",
+                "cover_url": "",
+                "release_date": "2021-11-19",
+                "genres": ["FPS", "Action"],
+                "rating": 78
+            },
+            {
+                "id": 3,
+                "name": "Call of Duty: Modern Warfare II",
+                "cover_url": "",
+                "release_date": "2022-10-28",
+                "genres": ["FPS", "Action"],
+                "rating": 85
+            },
+            {
+                "id": 4,
+                "name": "Counter-Strike 2",
+                "cover_url": "",
+                "release_date": "2023-09-27",
+                "genres": ["FPS", "Competitive"],
+                "rating": 92
+            },
+            {
+                "id": 5,
+                "name": "Cyberpunk 2077",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2lye.jpg",
+                "release_date": "2020-12-10",
+                "genres": ["RPG", "Action"],
+                "rating": 86
+            },
+            {
+                "id": 6,
+                "name": "Destiny 2",
+                "cover_url": "",
+                "release_date": "2017-09-06",
+                "genres": ["FPS", "MMO"],
+                "rating": 88
+            },
+            {
+                "id": 7,
+                "name": "Elden Ring",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co3p8l.jpg",
+                "release_date": "2022-02-25",
+                "genres": ["RPG", "Action"],
+                "rating": 96
+            },
+            {
+                "id": 8,
+                "name": "FIFA 23",
+                "cover_url": "",
+                "release_date": "2022-09-30",
+                "genres": ["Sports", "Simulation"],
+                "rating": 82
+            },
+            {
+                "id": 9,
+                "name": "Forza Horizon 5",
+                "cover_url": "",
+                "release_date": "2021-11-09",
+                "genres": ["Racing", "Open World"],
+                "rating": 91
+            },
+            {
+                "id": 10,
+                "name": "God of War",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2i4n.jpg",
+                "release_date": "2018-04-20",
+                "genres": ["Action", "Adventure"],
+                "rating": 94
+            },
+            {
+                "id": 11,
+                "name": "Grand Theft Auto V",
+                "cover_url": "",
+                "release_date": "2013-09-17",
+                "genres": ["Action", "Open World"],
+                "rating": 95
+            },
+            {
+                "id": 12,
+                "name": "Hogwarts Legacy",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5p7q.jpg",
+                "release_date": "2023-02-10",
+                "genres": ["RPG", "Adventure"],
+                "rating": 84
+            },
+            {
+                "id": 13,
+                "name": "Left 4 Dead 2",
+                "cover_url": "",
+                "release_date": "2009-11-17",
+                "genres": ["FPS", "Co-op"],
+                "rating": 93
+            },
+            {
+                "id": 14,
+                "name": "Minecraft",
+                "cover_url": "",
+                "release_date": "2011-11-18",
+                "genres": ["Sandbox", "Survival"],
+                "rating": 94
+            },
+            {
+                "id": 15,
+                "name": "Red Dead Redemption 2",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2afw.jpg",
+                "release_date": "2018-10-26",
+                "genres": ["Action", "Adventure"],
+                "rating": 97
+            },
+            {
+                "id": 16,
+                "name": "Resident Evil 4",
+                "cover_url": "",
+                "release_date": "2023-03-24",
+                "genres": ["Horror", "Action"],
+                "rating": 93
+            },
+            {
+                "id": 17,
+                "name": "Rocket League",
+                "cover_url": "",
+                "release_date": "2015-07-07",
+                "genres": ["Sports", "Competitive"],
+                "rating": 90
+            },
+            {
+                "id": 18,
+                "name": "Spider-Man Remastered",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5tqz.jpg",
+                "release_date": "2022-08-12",
+                "genres": ["Action", "Adventure"],
+                "rating": 87
+            },
+            {
+                "id": 19,
+                "name": "Starfield",
+                "cover_url": "",
+                "release_date": "2023-09-06",
+                "genres": ["RPG", "Sci-Fi"],
+                "rating": 85
+            },
+            {
+                "id": 20,
+                "name": "The Witcher 3: Wild Hunt",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2rhz.jpg",
+                "release_date": "2015-05-19",
+                "genres": ["RPG", "Adventure"],
+                "rating": 93
+            },
+            {
+                "id": 21,
+                "name": "Valorant",
+                "cover_url": "",
+                "release_date": "2020-06-02",
+                "genres": ["FPS", "Competitive"],
+                "rating": 89
+            }
+        ]
     
     def _parse_igdb_results(self, games_data: List[Dict]) -> List[Dict[str, Any]]:
-        """Parse IGDB API results"""
+        """Parse IGDB API results - kept for future API integration"""
         results = []
         for game in games_data:
             cover_url = ""
@@ -60,86 +224,9 @@ class GameService:
         return results
     
     def _get_mock_games(self, query: str) -> List[Dict[str, Any]]:
-        """Get mock games for demonstration"""
-        mock_games = [
-            {
-                "id": 1,
-                "name": "Cyberpunk 2077",
-                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2lye.jpg",
-                "release_date": "2020-12-10",
-                "genres": ["RPG", "Action"],
-                "rating": 86
-            },
-            {
-                "id": 2,
-                "name": "The Witcher 3: Wild Hunt",
-                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2rhz.jpg",
-                "release_date": "2015-05-19",
-                "genres": ["RPG", "Adventure"],
-                "rating": 93
-            },
-            {
-                "id": 3,
-                "name": "Elden Ring",
-                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co3p8l.jpg",
-                "release_date": "2022-02-25",
-                "genres": ["RPG", "Action"],
-                "rating": 96
-            },
-            {
-                "id": 4,
-                "name": "Red Dead Redemption 2",
-                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2afw.jpg",
-                "release_date": "2018-10-26",
-                "genres": ["Action", "Adventure"],
-                "rating": 97
-            },
-            {
-                "id": 5,
-                "name": "God of War",
-                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2i4n.jpg",
-                "release_date": "2018-04-20",
-                "genres": ["Action", "Adventure"],
-                "rating": 94
-            },
-            {
-                "id": 6,
-                "name": "Baldur's Gate 3",
-                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co6r0s.jpg",
-                "release_date": "2023-08-03",
-                "genres": ["RPG", "Strategy"],
-                "rating": 96
-            },
-            {
-                "id": 7,
-                "name": "Hogwarts Legacy",
-                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5p7q.jpg",
-                "release_date": "2023-02-10",
-                "genres": ["RPG", "Adventure"],
-                "rating": 84
-            },
-            {
-                "id": 8,
-                "name": "Spider-Man Remastered",
-                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5tqz.jpg",
-                "release_date": "2022-08-12",
-                "genres": ["Action", "Adventure"],
-                "rating": 87
-            }
-        ]
-        
-        if not query or query.strip() == "":
-            return mock_games[:4]
-        
-        # Filter mock games by query
-        query_lower = query.lower().strip()
-        filtered = [
-            game for game in mock_games 
-            if query_lower in game["name"].lower()
-        ]
-        
-        # If no exact matches, return all games as suggestions
-        return filtered if filtered else mock_games[:6]
+        """Legacy method - now returns all games"""
+        # This method is deprecated, use _get_all_games() instead
+        return self._get_all_games()
     
     def get_game_details(self, game_id: int) -> Optional[Dict[str, Any]]:
         """Get detailed information about a specific game"""
