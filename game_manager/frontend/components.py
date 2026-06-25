@@ -85,7 +85,7 @@ class GameCard(ctk.CTkFrame):
             fg_color=self.theme.COLORS["bg_secondary"],
             corner_radius=self.theme.SPACING["corner_radius"],
             border_width=2,
-            border_color="transparent"
+            # Removido border_color="transparent" para evitar erro de transparência
         )
         
         self._setup_ui()

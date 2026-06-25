@@ -14,19 +14,30 @@ from frontend.main_window import run_app
 
 def main():
     """Main entry point for the Game Manager application"""
-    print("Starting Game Manager...")
-    print("=" * 50)
-    print("Game Manager v1.0.0")
-    print("A modern game management solution")
-    print("=" * 50)
+    # Hide console window on Windows unless there's an error
+    if sys.platform == 'win32':
+        try:
+            import ctypes
+            ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+        except Exception:
+            pass
     
     try:
         run_app()
     except KeyboardInterrupt:
-        print("\nApplication closed by user.")
         sys.exit(0)
     except Exception as e:
+        # Show console and error if something goes wrong
+        if sys.platform == 'win32':
+            try:
+                import ctypes
+                ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 1)
+            except Exception:
+                pass
         print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        input("Press Enter to exit...")
         sys.exit(1)
 
 
