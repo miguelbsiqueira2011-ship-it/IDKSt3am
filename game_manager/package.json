@@ -1,0 +1,18 @@
+{
+  "name": "game-manager",
+  "version": "1.0.0",
+  "description": "Modern Game Manager Desktop Application",
+  "main": "backend/main.py",
+  "scripts": {
+    "start": "python backend/main.py",
+    "dev": "python backend/main.py --dev"
+  },
+  "author": "Game Manager Team",
+  "license": "MIT",
+  "dependencies": {
+    "python": "^3.8",
+    "customtkinter": "^5.2.0",
+    "pillow": "^10.0.0",
+    "requests": "^2.31.0"
+  }
+}
