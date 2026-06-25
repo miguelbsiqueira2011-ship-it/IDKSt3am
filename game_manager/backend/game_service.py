@@ -15,10 +15,52 @@ class GameService:
         self.selected_game: Optional[Dict[str, Any]] = None
         
     def search_games(self, query: str) -> List[Dict[str, Any]]:
-        """Search for games using IGDB API (mock implementation)"""
-        # In production, this would use the actual IGDB API
-        # For now, return mock data for demonstration
+        """Search for games using IGDB API (with fallback to mock data)"""
+        try:
+            # Try to use IGDB API if credentials are available
+            headers = {
+                'Client-ID': 'your_client_id',  # Replace with actual client ID
+                'Authorization': 'Bearer your_token'  # Replace with actual token
+            }
+            
+            # Search endpoint
+            response = requests.post(
+                f"{self.api_base}/games",
+                headers=headers,
+                data=f'search "{query}"; fields name, cover.url, release_dates, genres, rating;',
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                games_data = response.json()
+                if games_data:
+                    return self._parse_igdb_results(games_data[:5])
+        except Exception:
+            pass  # Fall back to mock data
         
+        # Return mock data for demonstration
+        return self._get_mock_games(query)
+    
+    def _parse_igdb_results(self, games_data: List[Dict]) -> List[Dict[str, Any]]:
+        """Parse IGDB API results"""
+        results = []
+        for game in games_data:
+            cover_url = ""
+            if game.get('cover') and game['cover'].get('url'):
+                cover_url = f"https://images.igdb.com/igdb/image/upload/t_cover_big{game['cover']['url']}"
+            
+            results.append({
+                "id": game.get('id', 0),
+                "name": game.get('name', 'Unknown'),
+                "cover_url": cover_url,
+                "release_date": game.get('release_dates', [{}])[0].get('y', 'Unknown'),
+                "genres": [g.get('name', '') for g in game.get('genres', [])][:3],
+                "rating": int(game.get('rating', 0))
+            })
+        return results
+    
+    def _get_mock_games(self, query: str) -> List[Dict[str, Any]]:
+        """Get mock games for demonstration"""
         mock_games = [
             {
                 "id": 1,
@@ -59,20 +101,45 @@ class GameService:
                 "release_date": "2018-04-20",
                 "genres": ["Action", "Adventure"],
                 "rating": 94
+            },
+            {
+                "id": 6,
+                "name": "Baldur's Gate 3",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co6r0s.jpg",
+                "release_date": "2023-08-03",
+                "genres": ["RPG", "Strategy"],
+                "rating": 96
+            },
+            {
+                "id": 7,
+                "name": "Hogwarts Legacy",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5p7q.jpg",
+                "release_date": "2023-02-10",
+                "genres": ["RPG", "Adventure"],
+                "rating": 84
+            },
+            {
+                "id": 8,
+                "name": "Spider-Man Remastered",
+                "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5tqz.jpg",
+                "release_date": "2022-08-12",
+                "genres": ["Action", "Adventure"],
+                "rating": 87
             }
         ]
         
-        if not query:
-            return mock_games[:3]
+        if not query or query.strip() == "":
+            return mock_games[:4]
         
         # Filter mock games by query
-        query_lower = query.lower()
+        query_lower = query.lower().strip()
         filtered = [
             game for game in mock_games 
             if query_lower in game["name"].lower()
         ]
         
-        return filtered if filtered else mock_games[:3]
+        # If no exact matches, return all games as suggestions
+        return filtered if filtered else mock_games[:6]
     
     def get_game_details(self, game_id: int) -> Optional[Dict[str, Any]]:
         """Get detailed information about a specific game"""

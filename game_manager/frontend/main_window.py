@@ -35,10 +35,112 @@ class MainWindow(ctk.CTk):
         
         self.selected_game: Optional[Dict[str, Any]] = None
         self.history = []
+        self.missing_tools = []
         
         self._setup_window()
+        self._check_dependencies()  # Check dependencies first
         self._setup_ui()
         self._start_status_monitor()
+    
+    def _check_dependencies(self) -> None:
+        """Check for missing dependencies and show installation dialog"""
+        tools_status = self.tools_manager.get_all_tools_status()
+        
+        self.missing_tools = [
+            name for name, info in tools_status.items() 
+            if not info["installed"]
+        ]
+        
+        if self.missing_tools:
+            # Schedule dialog to appear after window is shown
+            self.after(500, self._show_missing_tools_dialog)
+    
+    def _show_missing_tools_dialog(self) -> None:
+        """Show dialog for missing tools"""
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("Ferramentas Necessárias")
+        dialog.geometry("500x400")
+        dialog.attributes('-topmost', True)
+        dialog.transient(self)
+        
+        # Make dialog modal
+        dialog.grab_set()
+        
+        # Content
+        content_frame = ctk.CTkFrame(dialog, fg_color=self.theme.COLORS["bg_primary"])
+        content_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        # Title
+        title_label = ctk.CTkLabel(
+            content_frame,
+            text="⚠️ Ferramentas Necessárias",
+            font=(self.theme.FONTS["family"], self.theme.FONTS["size_heading"], "bold"),
+            text_color=self.theme.COLORS["text_primary"]
+        )
+        title_label.pack(pady=(0, 10))
+        
+        subtitle_label = ctk.CTkLabel(
+            content_frame,
+            text="As seguintes ferramentas precisam ser instaladas:",
+            font=(self.theme.FONTS["family"], self.theme.FONTS["size_body"]),
+            text_color=self.theme.COLORS["text_secondary"]
+        )
+        subtitle_label.pack(pady=(0, 20))
+        
+        # Tools list with install buttons
+        tools_frame = ctk.CTkScrollableFrame(content_frame, fg_color="transparent")
+        tools_frame.pack(fill="both", expand=True, pady=(0, 20))
+        
+        tools_status = self.tools_manager.get_all_tools_status()
+        
+        for tool_name in self.missing_tools:
+            tool_info = tools_status.get(tool_name, {})
+            tool_display_name = tool_info.get("name", tool_name.title())
+            tool_desc = tool_info.get("description", "")
+            
+            tool_frame = ctk.CTkFrame(
+                tools_frame,
+                fg_color=self.theme.COLORS["bg_secondary"],
+                corner_radius=self.theme.SPACING["corner_radius"]
+            )
+            tool_frame.pack(fill="x", pady=10)
+            
+            info_frame = ctk.CTkFrame(tool_frame, fg_color="transparent")
+            info_frame.pack(side="left", fill="both", expand=True, padx=15, pady=15)
+            
+            name_label = ctk.CTkLabel(
+                info_frame,
+                text=f"✗ {tool_display_name}",
+                font=(self.theme.FONTS["family"], self.theme.FONTS["size_body"], "bold"),
+                text_color=self.theme.COLORS["accent_error"]
+            )
+            name_label.pack(anchor="w")
+            
+            desc_label = ctk.CTkLabel(
+                info_frame,
+                text=tool_desc,
+                font=(self.theme.FONTS["family"], self.theme.FONTS["size_small"]),
+                text_color=self.theme.COLORS["text_secondary"]
+            )
+            desc_label.pack(anchor="w")
+            
+            install_btn = ActionButton(
+                tool_frame,
+                text="Instalar",
+                command=lambda t=tool_name, d=dialog: self._install_tool(t, d),
+                style="primary",
+                width=100
+            )
+            install_btn.pack(side="right", padx=15, pady=15)
+        
+        # Continue button
+        continue_btn = ActionButton(
+            content_frame,
+            text="Continuar Mesmo Assim",
+            command=dialog.destroy,
+            style="secondary"
+        )
+        continue_btn.pack(fill="x")
     
     def _setup_window(self) -> None:
         """Configure main window properties"""
@@ -647,23 +749,75 @@ class MainWindow(ctk.CTk):
         log_text.insert("end", "Inicialização completa\n")
         log_text.insert("end", "Status monitor iniciado\n")
     
-    def _install_tool(self, tool_key: str, parent_frame) -> None:
-        """Handle tool installation"""
-        result = self.tools_manager.install_tool(tool_key)
+    def _install_tool(self, tool_key: str, parent_frame=None) -> None:
+        """Handle tool installation with progress dialog"""
+        # Create progress dialog
+        progress_dialog = ctk.CTkToplevel(self)
+        progress_dialog.title(f"Instalando {tool_key.title()}")
+        progress_dialog.geometry("400x200")
+        progress_dialog.attributes('-topmost', True)
+        progress_dialog.transient(self)
         
-        if result.get("success"):
-            if result.get("manual_install"):
-                messagebox.showinfo(
-                    "Instalação",
-                    result.get("message", "Por favor, complete a instalação manualmente.")
-                )
+        content_frame = ctk.CTkFrame(progress_dialog, fg_color=self.theme.COLORS["bg_primary"])
+        content_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        title_label = ctk.CTkLabel(
+            content_frame,
+            text=f"Instalando {tool_key.title()}...",
+            font=(self.theme.FONTS["family"], self.theme.FONTS["size_body"], "bold"),
+            text_color=self.theme.COLORS["text_primary"]
+        )
+        title_label.pack(pady=(0, 15))
+        
+        progress_bar = ProgressBar(content_frame, width=300)
+        progress_bar.pack(pady=(0, 10))
+        progress_bar.set(0)
+        
+        status_label = ctk.CTkLabel(
+            content_frame,
+            text="Iniciando instalação...",
+            font=(self.theme.FONTS["family"], self.theme.FONTS["size_small"]),
+            text_color=self.theme.COLORS["text_secondary"]
+        )
+        status_label.pack()
+        
+        def update_progress(progress: int, message: str):
+            progress_bar.set(progress / 100.0)
+            status_label.configure(text=message)
+        
+        def install_thread():
+            result = self.tools_manager.install_tool(tool_key, update_progress)
+            
+            # Close dialog and show result
+            progress_dialog.after(0, progress_dialog.destroy)
+            
+            if result.get("success"):
+                if result.get("manual_install"):
+                    self.after(100, lambda: messagebox.showinfo(
+                        "Instalação",
+                        result.get("message", "Por favor, complete a instalação manualmente.")
+                    ))
+                else:
+                    self.after(100, lambda: messagebox.showinfo(
+                        "Instalação", 
+                        "Ferramenta instalada com sucesso!"
+                    ))
+                # Refresh tools status if in settings
+                if parent_frame and hasattr(parent_frame, 'winfo_exists') and parent_frame.winfo_exists():
+                    self.after(500, self._refresh_tools_tab)
             else:
-                messagebox.showinfo("Instalação", "Ferramenta instalada com sucesso!")
-        else:
-            messagebox.showerror(
-                "Erro",
-                result.get("error", "Falha na instalação")
-            )
+                self.after(100, lambda: messagebox.showerror(
+                    "Erro",
+                    result.get("error", "Falha na instalação")
+                ))
+        
+        thread = threading.Thread(target=install_thread, daemon=True)
+        thread.start()
+    
+    def _refresh_tools_tab(self) -> None:
+        """Refresh the tools tab in settings"""
+        # This will be called after installation to refresh status
+        pass
 
 
 def run_app():

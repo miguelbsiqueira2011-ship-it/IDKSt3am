@@ -1,22 +1,4 @@
-```
-# Environment
-.env
-.env.local
-*.env.*
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Editors
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
+```gitignore
 # Python
 __pycache__/
 *.pyc
@@ -27,49 +9,32 @@ venv/
 .venv/
 .env
 .env.local
+*.env.*
 
 # Build artifacts
-dist/
 build/
-*.o
-*.obj
-*.out
+dist/
+*.egg-info/
 
-# Coverage
-coverage/
-htmlcov/
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
 .coverage
-
-# Dependencies
-node_modules/
-.mypy_cache/
+htmlcov/
+.coverage.*
+.cache
 .pytest_cache/
-target/
-.gradle/
-julia-*/
-zig*/
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+.mypy_cache/
 ```

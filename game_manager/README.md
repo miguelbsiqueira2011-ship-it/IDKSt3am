@@ -79,11 +79,13 @@ lua -v
 
 **Instalação:**
 
-#### Windows (PowerShell)
+#### Windows (PowerShell como Administrador)
 ```powershell
-# Instalador oficial do Lua Tools
+# Abra o PowerShell como Administrador e execute:
 irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
 ```
+
+> ⚠️ **Importante:** Execute o PowerShell como Administrador (clique direito → Executar como Administrador)
 
 #### macOS
 ```bash
@@ -123,14 +125,19 @@ pip install -r requirements.txt
 ```
 
 3. **Execute a aplicação:**
+
+**Windows (Método Recomendado):**
+- Clique duas vezes no arquivo `run.bat`
+- Não é necessário abrir CMD manualmente!
+
+**Windows (Alternativo):**
 ```bash
 python main.py
 ```
 
-ou
-
+**Linux/macOS:**
 ```bash
-python backend/main.py
+python main.py
 ```
 
 ## 🎨 Interface

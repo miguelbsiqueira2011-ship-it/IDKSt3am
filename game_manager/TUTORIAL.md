@@ -58,11 +58,13 @@ lua -v
 
 **Se NÃO estiver instalado:**
 
-**Windows (PowerShell):**
+**Windows (PowerShell como Administrador):**
 ```powershell
-# Instalador oficial do Lua Tools
+# Instalador oficial do Lua Tools - Execute no PowerShell
 irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
 ```
+
+> ⚠️ **Importante:** Execute o PowerShell como Administrador (clique direito → Executar como Administrador)
 
 **macOS:**
 ```bash
@@ -125,8 +127,14 @@ pip install psutil
 
 ### Passo 4: Executar a Aplicação
 
-**Windows:**
-- Basta clicar duas vezes no arquivo `run.bat` para iniciar a aplicação.
+**Windows (Método Recomendado):**
+- Basta clicar **duas vezes** no arquivo `run.bat` para iniciar a aplicação.
+- Não é necessário abrir CMD ou PowerShell manualmente!
+
+**Windows (Alternativo via CMD/PowerShell):**
+```bash
+python main.py
+```
 
 **Linux/macOS:**
 ```bash
@@ -141,33 +149,70 @@ python backend/main.py
 
 ## ⚙️ Configuração das Ferramentas
 
-### Verificando Status das Ferramentas
+### Verificação Automática ao Iniciar
 
-Ao iniciar a aplicação:
+Ao iniciar o Game Manager pela primeira vez:
+
+1. O sistema **verifica automaticamente** se Steam e Lua estão instalados
+2. Se alguma ferramenta estiver faltando, uma janela aparecerá:
+
+```
+┌─────────────────────────────────────┐
+│   ⚠️ Ferramentas Necessárias        │
+├─────────────────────────────────────┤
+│ As seguintes ferramentas precisam  │
+│ ser instaladas:                     │
+│                                     │
+│ ✗ Steam                             │
+│   Steam client for game management  │
+│                    [ Instalar ]     │
+│                                     │
+│ ✗ Lua Tools                         │
+│   Lua runtime for script execution  │
+│                    [ Instalar ]     │
+│                                     │
+│     [ Continuar Mesmo Assim ]       │
+└─────────────────────────────────────┘
+```
+
+3. Clique em **"Instalar"** para cada ferramenta necessária
+4. Uma barra de progresso mostrará o status da instalação
+
+### Instalando Ferramentas pela Interface
+
+Se precisar instalar ferramentas após o início:
 
 1. Clique no botão **⚙️ Configurações** (canto superior direito)
 2. Vá para a aba **"Ferramentas"**
 3. Visualize o status de cada ferramenta:
    - ✓ Instalado (verde)
    - ✗ Não instalado (vermelho)
+4. Clique em **"Instalar"** para instalar a ferramenta faltante
 
-### Instalando Ferramentas pela Interface
+### Processo de Instalação
 
-Se alguma ferramenta não estiver instalada:
+**Para Steam:**
+- A página oficial de download será aberta no navegador
+- Siga o assistente de instalação do site
 
-1. Na aba **Ferramentas**, localize a ferramenta
-2. Clique no botão **"Instalar"**
-3. Siga as instruções:
-   - **Steam**: A página de download será aberta
-   - **Lua**: Instalação automática (quando possível) ou manual
+**Para Lua Tools (Windows):**
+- O instalador PowerShell será executado automaticamente
+- Comando usado: `irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex`
+- Aguarde a conclusão (pode levar alguns segundos)
+- Mensagem de sucesso aparecerá
+
+**Para Lua (macOS/Linux):**
+- Tentativa de instalação automática via gerenciador de pacotes
+- Se falhar, instruções manuais serão fornecidas
 
 ### Pós-Instalação
 
 Após instalar as ferramentas:
 
-1. Reinicie a aplicação Game Manager
+1. **Reinicie a aplicação** Game Manager
 2. Verifique novamente o status na aba Ferramentas
 3. Os indicadores devem mostrar "✓ Instalado"
+4. Todas as integrações devem estar "Online"
 
 ---
 
@@ -237,6 +282,7 @@ Operação concluída com sucesso.
 - Busca em tempo real
 - Resultados com capa, nome e gêneros
 - Rating visível (estrelas)
+- Mais jogos populares incluídos como fallback
 
 ### 2. Seleção Visual
 - Cards interativos
@@ -298,13 +344,16 @@ Operação concluída com sucesso.
 
 ### Problema: Lua não detectado
 
-**Sintoma:** Mensagem "Lua not installed"
+**Sintoma:** Mensagem "Lua not installed" ou indicador vermelho
 
 **Soluções:**
 
 1. **Instale Lua Tools (Windows):**
    ```powershell
-   # Abra o PowerShell como administrador e execute:
+   # Abra o PowerShell COMO ADMINISTRADOR
+   # Clique direito no ícone do PowerShell → Executar como Administrador
+   
+   # Execute o comando oficial:
    irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
    ```
 
@@ -321,13 +370,14 @@ Operação concluída com sucesso.
    ```
 
 3. **Adicione ao PATH** (se necessário):
-   - Windows: Adicione `C:\Program Files\Lua\5.4\` ao PATH
-   - Reinicie o terminal após alterar o PATH
+   - Windows: Adicione `C:\Program Files\Lua\5.4\` ao PATH do sistema
+   - Reinicie o terminal/aplicação após alterar o PATH
 
 4. **Verifique a instalação:**
    ```bash
    lua -v
    ```
+   Deve mostrar algo como: `Lua 5.4.x  Copyright (C) ...`
 
 ### Problema: Erro ao adicionar jogo
 
@@ -378,6 +428,26 @@ Operação concluída com sucesso.
 pip install -r requirements.txt --force-reinstall
 ```
 
+### Problema: run.bat não funciona (Windows)
+
+**Sintoma:** Janela abre e fecha imediatamente
+
+**Soluções:**
+
+1. **Verifique se Python está instalado:**
+   ```cmd
+   python --version
+   ```
+
+2. **Execute manualmente para ver o erro:**
+   ```cmd
+   python main.py
+   ```
+
+3. **Verifique o PATH do Python:**
+   - Adicione Python ao PATH do sistema
+   - Reinicie o computador
+
 ---
 
 ## 📞 Suporte Adicional
@@ -410,7 +480,7 @@ Use esta checklist para garantir que tudo está configurado:
 - [ ] Dependências Python instaladas
 - [ ] Steam instalado e funcionando
 - [ ] Lua instalado e no PATH
-- [ ] Game Manager inicia sem erros
+- [ ] Game Manager inicia sem erros (via run.bat ou main.py)
 - [ ] Todas as integrações mostram "Online"
 - [ ] Consegue pesquisar jogos
 - [ ] Consegue adicionar um jogo à biblioteca
