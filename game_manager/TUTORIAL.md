@@ -60,11 +60,14 @@ lua -v
 
 **Windows (PowerShell como Administrador):**
 ```powershell
-# Instalador oficial do Lua Tools - Execute no PowerShell
+# ⚠️ IMPORTANTE: Abra o PowerShell COMO ADMINISTRADOR
+# Clique direito no ícone do PowerShell → Executar como Administrador
+# Depois execute este comando:
+
 irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
 ```
 
-> ⚠️ **Importante:** Execute o PowerShell como Administrador (clique direito → Executar como Administrador)
+> ⚠️ **Importante:** O PowerShell DEVE ser executado como Administrador. Se não tiver permissões administrativas, a instalação falhará.
 
 **macOS:**
 ```bash
@@ -96,7 +99,6 @@ sudo pacman -S lua
 
 ```bash
 # Clone o repositório ou baixe o arquivo ZIP
-git clone <URL_DO_REPOSITORIO>
 cd game_manager
 ```
 
@@ -115,21 +117,12 @@ pip install requests
 pip install psutil
 ```
 
-### Passo 3: Verificar Instalação
+### Passo 3: Executar a Aplicação
 
-```bash
-# Execute o script de verificação
-./start.sh  # Linux/macOS
-
-# Ou no Windows (PowerShell):
-.\start.ps1
-```
-
-### Passo 4: Executar a Aplicação
-
-**Windows (Método Recomendado):**
-- Basta clicar **duas vezes** no arquivo `run.bat` para iniciar a aplicação.
-- Não é necessário abrir CMD ou PowerShell manualmente!
+**Windows (Método Recomendado - SEM CMD VISÍVEL):**
+- Basta clicar **duas vezes** no arquivo `run.bat`
+- A aplicação abrirá sem mostrar a janela do CMD
+- Se ocorrer algum erro, o CMD aparecerá automaticamente para mostrar a mensagem de erro
 
 **Windows (Alternativo via CMD/PowerShell):**
 ```bash
@@ -138,11 +131,7 @@ python main.py
 
 **Linux/macOS:**
 ```bash
-# Método 1: Usando o script
 python main.py
-
-# Método 2: Diretamente
-python backend/main.py
 ```
 
 ---
@@ -154,7 +143,7 @@ python backend/main.py
 Ao iniciar o Game Manager pela primeira vez:
 
 1. O sistema **verifica automaticamente** se Steam e Lua estão instalados
-2. Se alguma ferramenta estiver faltando, uma janela aparecerá:
+2. Se alguma ferramenta estiver faltando, uma janela aparecerá IMEDIATAMENTE:
 
 ```
 ┌─────────────────────────────────────┐
@@ -177,6 +166,7 @@ Ao iniciar o Game Manager pela primeira vez:
 
 3. Clique em **"Instalar"** para cada ferramenta necessária
 4. Uma barra de progresso mostrará o status da instalação
+5. **IMPORTANTE:** Você DEVE instalar as ferramentas antes de usar o programa!
 
 ### Instalando Ferramentas pela Interface
 
@@ -194,12 +184,14 @@ Se precisar instalar ferramentas após o início:
 **Para Steam:**
 - A página oficial de download será aberta no navegador
 - Siga o assistente de instalação do site
+- Após instalar, reinicie o Game Manager
 
 **Para Lua Tools (Windows):**
 - O instalador PowerShell será executado automaticamente
 - Comando usado: `irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex`
 - Aguarde a conclusão (pode levar alguns segundos)
 - Mensagem de sucesso aparecerá
+- **Nota:** Se a instalação automática falhar, você será redirecionado para a página de download manual
 
 **Para Lua (macOS/Linux):**
 - Tentativa de instalação automática via gerenciador de pacotes
@@ -232,16 +224,17 @@ Ao abrir o Game Manager (via `run.bat` no Windows), você verá:
 │  🔍 [Filtrar jogos...]              │
 │                                     │
 │  ┌───────────────────────────────┐  │
-│  │ ▸ Baldur's Gate 3             │  │
-│  │ ▸ Battlefield 2042            │  │
-│  │ ▸ Call of Duty: MW II         │  │
-│  │ ▸ Counter-Strike 2            │  │
-│  │ ▸ Cyberpunk 2077              │  │
-│  │ ▸ Elden Ring                  │  │
-│  │ ▸ God of War                  │  │
-│  │ ▸ Minecraft                   │  │
-│  │ ▸ Red Dead Redemption 2       │  │
-│  │ ▸ The Witcher 3               │  │
+│  │ 🎮 Baldur's Gate 3            │  │
+│  │    RPG • Strategy  ★ 96       │  │
+│  │                  [Adicionar]  │  │
+│  ├───────────────────────────────┤  │
+│  │ 🎮 Battlefield 2042           │  │
+│  │    FPS • Action  ★ 78         │  │
+│  │                  [Adicionar]  │  │
+│  ├───────────────────────────────┤  │
+│  │ 🎮 Counter-Strike 2           │  │
+│  │    FPS • Competitive  ★ 92    │  │
+│  │                  [Adicionar]  │  │
 │  └───────────────────────────────┘  │
 │                                     │
 ├─────────────────────────────────────┤
@@ -253,29 +246,28 @@ Ao abrir o Game Manager (via `run.bat` no Windows), você verá:
 
 ### Adicionando seu Primeiro Jogo
 
-#### Passo 1: Escolher o Jogo (SEM DIGITAR!)
+#### Método Rápido (RECOMENDADO)
+
 1. **Todos os jogos já aparecem listados** na tela inicial
-2. A lista está em **ordem alfabética**
-3. Basta **clicar no card do jogo** que você deseja
-4. Se quiser filtrar, digite no campo "Filtrar jogos..."
+2. Cada card tem um botão **"Adicionar"** no canto inferior direito
+3. Basta **clicar em "Adicionar"** no jogo que você deseja
+4. Pronto! O processo começará imediatamente
 
-#### Passo 2: Confirmar Seleção
-1. Ao clicar, o card fica destacado (fundo mais claro)
-2. As informações do jogo são exibidas abaixo
-3. Verifique se é o jogo correto
+#### Passo a Passo Detalhado
 
-#### Passo 3: Adicionar à Biblioteca
-1. Clique em **"Adicionar à Biblioteca"** (botão grande e destacado)
-2. Uma barra de progresso aparecerá
+**Passo 1: Escolher o Jogo**
+- Role a lista de jogos (todos em ordem alfabética)
+- Use o filtro "Filtrar jogos..." se quiser buscar rapidamente
+- Clique no botão **"Adicionar"** do jogo desejado
 
-#### Passo 4: Aguardar Processamento
+**Passo 2: Aguardar Processamento**
 ```
 Processando...
 [████████████░░░░░░░░] 70%
 Adicionando ao Steam shortcuts...
 ```
 
-#### Passo 5: Conclusão
+**Passo 3: Conclusão**
 ```
          ✓
 Operação concluída com sucesso.
@@ -311,30 +303,29 @@ A aplicação já inclui **21 jogos populares** prontos para seleção:
 - The Witcher 3: Wild Hunt
 - Valorant
 
-> 💡 **Dica:** Não é necessário digitar o nome do jogo! Basta rolar a lista e clicar no que você quer. Use o filtro apenas se desejar buscar um jogo específico rapidamente.
+> 💡 **Dica:** Não é necessário digitar o nome do jogo! Cada card já tem seu próprio botão "Adicionar". Use o filtro apenas se desejar buscar um jogo específico rapidamente.
 
 ---
 
 ## 🎯 Funcionalidades Principais
 
-### 1. Pesquisa de Jogos
-- Busca em tempo real
-- Resultados com capa, nome e gêneros
-- Rating visível (estrelas)
-- Mais jogos populares incluídos como fallback
+### 1. Lista de Jogos com Botão Direto
+- Todos os jogos visíveis imediatamente
+- Botão "Adicionar" em cada card
+- Layout horizontal moderno
+- Informações completas (nome, gêneros, rating)
 
-### 2. Seleção Visual
-- Cards interativos
-- Feedback visual ao selecionar
-- Informações detalhadas
+### 2. Filtro de Busca
+- Digite para filtrar a lista em tempo real
+- Resultados atualizados instantaneamente
 
 ### 3. Progresso em Tempo Real
 - Barra de progresso animada
-- Mensagens de status
-- Tempo estimado
+- Mensagens de status detalhadas
+- Feedback visual constante
 
 ### 4. Painel de Status
-- Monitoramento contínuo
+- Monitoramento contínuo das integrações
 - Indicadores online/offline
 - Atualização automática
 
@@ -364,6 +355,27 @@ A aplicação já inclui **21 jogos populares** prontos para seleção:
 
 ## 🐛 Solução de Problemas
 
+### Problema: Janela abre e fecha imediatamente
+
+**Sintoma:** Ao clicar no run.bat, a janela pisca e some
+
+**Soluções:**
+
+1. **Execute manualmente para ver o erro:**
+   ```cmd
+   python main.py
+   ```
+
+2. **Verifique se Python está instalado:**
+   ```cmd
+   python --version
+   ```
+
+3. **Instale as dependências:**
+   ```cmd
+   pip install -r requirements.txt
+   ```
+
 ### Problema: Steam não detectado
 
 **Sintoma:** Indicador mostra "Offline" ou "Não instalado"
@@ -389,8 +401,8 @@ A aplicação já inclui **21 jogos populares** prontos para seleção:
 
 1. **Instale Lua Tools (Windows):**
    ```powershell
-   # Abra o PowerShell COMO ADMINISTRADOR
-   # Clique direito no ícone do PowerShell → Executar como Administrador
+   # ⚠️ ABRA O POWERSHELL COMO ADMINISTRADOR!
+   # Clique direito → Executar como Administrador
    
    # Execute o comando oficial:
    irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
@@ -432,9 +444,9 @@ A aplicação já inclui **21 jogos populares** prontos para seleção:
 
 3. **Tente novamente**
 
-### Problema: Interface não abre
+### Problema: Interface não abre / Erro do tkinter
 
-**Sintoma:** Erro do tkinter ou tela preta
+**Sintoma:** Erro sobre tkinter ou tela preta
 
 **Soluções:**
 
@@ -467,26 +479,6 @@ A aplicação já inclui **21 jogos populares** prontos para seleção:
 pip install -r requirements.txt --force-reinstall
 ```
 
-### Problema: run.bat não funciona (Windows)
-
-**Sintoma:** Janela abre e fecha imediatamente
-
-**Soluções:**
-
-1. **Verifique se Python está instalado:**
-   ```cmd
-   python --version
-   ```
-
-2. **Execute manualmente para ver o erro:**
-   ```cmd
-   python main.py
-   ```
-
-3. **Verifique o PATH do Python:**
-   - Adicione Python ao PATH do sistema
-   - Reinicie o computador
-
 ---
 
 ## 📞 Suporte Adicional
@@ -516,12 +508,12 @@ Ao reportar um problema, inclua:
 Use esta checklist para garantir que tudo está configurado:
 
 - [ ] Python 3.8+ instalado
-- [ ] Dependências Python instaladas
+- [ ] Dependências Python instaladas (`pip install -r requirements.txt`)
 - [ ] Steam instalado e funcionando
 - [ ] Lua instalado e no PATH
-- [ ] Game Manager inicia sem erros (via run.bat ou main.py)
+- [ ] Game Manager inicia sem erros (clique duplo em run.bat)
 - [ ] Todas as integrações mostram "Online"
-- [ ] Consegue pesquisar jogos
+- [ ] Consegue ver a lista de jogos
 - [ ] Consegue adicionar um jogo à biblioteca
 
 ---
@@ -530,4 +522,11 @@ Use esta checklist para garantir que tudo está configurado:
 
 Você completou a configuração do Game Manager. Agora você pode gerenciar sua biblioteca de jogos de forma moderna e eficiente!
 
-Para mais informações, consulte o README.md ou abra uma issue no repositório.
+**Resumo rápido:**
+1. Clique duas vezes em `run.bat` (Windows) ou execute `python main.py`
+2. Se faltar alguma ferramenta, instale usando os botões na janela que aparecer
+3. Clique em "Adicionar" no jogo que você quer
+4. Aguarde o processamento
+5. Clique em "Reiniciar Steam" quando concluir
+
+Para mais informações, consulte o README.md.

@@ -71,99 +71,104 @@ class SearchBox(ctk.CTkFrame):
 
 
 class GameCard(ctk.CTkFrame):
-    """Card component for displaying game information"""
+    """Card component for displaying game information with Add button"""
     
-    def __init__(self, master, game_data: dict, on_select: Optional[Callable] = None, **kwargs):
+    def __init__(self, master, game_data: dict, on_add: Optional[Callable] = None, **kwargs):
         super().__init__(master, **kwargs)
         
         self.theme = ThemeManager()
         self.game_data = game_data
-        self.on_select = on_select
+        self.on_add = on_add
         self.is_selected = False
         
         self.configure(
             fg_color=self.theme.COLORS["bg_secondary"],
             corner_radius=self.theme.SPACING["corner_radius"],
-            border_width=2,
-            # Removido border_color="transparent" para evitar erro de transparência
+            border_width=0
         )
         
         self._setup_ui()
-        self.bind("<Button-1>", lambda e: self._select())
         
     def _setup_ui(self) -> None:
-        """Setup the card UI"""
-        # Cover image placeholder (would load actual image in production)
+        """Setup the card UI with horizontal layout"""
+        # Main horizontal layout
+        main_frame = ctk.CTkFrame(self, fg_color="transparent")
+        main_frame.pack(fill="both", expand=True, padx=16, pady=16)
+        
+        # Left side - Cover image
         self.cover_frame = ctk.CTkFrame(
-            self,
+            main_frame,
             fg_color=self.theme.COLORS["bg_tertiary"],
             corner_radius=8,
-            height=200,
-            width=150
+            height=120,
+            width=90
         )
-        self.cover_frame.pack(padx=16, pady=(16, 8), anchor="w")
+        self.cover_frame.pack(side="left", padx=(0, 16))
         
         self.cover_label = ctk.CTkLabel(
             self.cover_frame,
             text="🎮",
-            font=(self.theme.FONTS["family"], 48),
+            font=(self.theme.FONTS["family"], 32),
             text_color=self.theme.COLORS["text_muted"]
         )
         self.cover_label.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Game info
-        self.info_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.info_frame.pack(fill="x", padx=16, pady=(0, 16))
+        # Right side - Info and button
+        info_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        info_frame.pack(side="left", fill="both", expand=True)
         
         # Game name
         self.name_label = ctk.CTkLabel(
-            self.info_frame,
+            info_frame,
             text=self.game_data.get("name", "Unknown Game"),
             font=(self.theme.FONTS["family"], self.theme.FONTS["size_heading"], "bold"),
             text_color=self.theme.COLORS["text_primary"],
             anchor="w"
         )
-        self.name_label.pack(fill="x", pady=(0, 4))
+        self.name_label.pack(anchor="w", pady=(0, 4))
         
         # Genres
         genres = self.game_data.get("genres", [])
         if genres:
             self.genres_label = ctk.CTkLabel(
-                self.info_frame,
+                info_frame,
                 text=" • ".join(genres),
                 font=(self.theme.FONTS["family"], self.theme.FONTS["size_small"]),
                 text_color=self.theme.COLORS["text_secondary"],
                 anchor="w"
             )
-            self.genres_label.pack(fill="x")
+            self.genres_label.pack(anchor="w")
         
         # Rating
         rating = self.game_data.get("rating", 0)
         self.rating_label = ctk.CTkLabel(
-            self.info_frame,
+            info_frame,
             text=f"★ {rating}",
             font=(self.theme.FONTS["family"], self.theme.FONTS["size_small"], "bold"),
             text_color=self.theme.COLORS["accent_warning"],
             anchor="w"
         )
-        self.rating_label.pack(fill="x", pady=(4, 0))
-    
-    def _select(self) -> None:
-        """Handle card selection"""
-        self.is_selected = not self.is_selected
-        self._update_appearance()
+        self.rating_label.pack(anchor="w", pady=(4, 0))
         
-        if self.on_select:
-            self.on_select(self.game_data, self.is_selected)
+        # Add button at bottom right
+        btn_frame = ctk.CTkFrame(info_frame, fg_color="transparent")
+        btn_frame.pack(side="bottom", fill="x", pady=(8, 0))
+        
+        from .components import ActionButton
+        self.add_btn = ActionButton(
+            btn_frame,
+            text="Adicionar",
+            command=self._on_add_click,
+            style="primary",
+            height=32,
+            width=100
+        )
+        self.add_btn.pack(side="right")
     
-    def _update_appearance(self) -> None:
-        """Update card appearance based on selection state"""
-        if self.is_selected:
-            self.configure(border_color=self.theme.COLORS["accent_primary"])
-            self.name_label.configure(text_color=self.theme.COLORS["accent_primary"])
-        else:
-            self.configure(border_color="transparent")
-            self.name_label.configure(text_color=self.theme.COLORS["text_primary"])
+    def _on_add_click(self) -> None:
+        """Handle add button click"""
+        if self.on_add:
+            self.on_add(self.game_data)
 
 
 class StatusIndicator(ctk.CTkFrame):
