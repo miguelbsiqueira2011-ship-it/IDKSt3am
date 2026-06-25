@@ -48,8 +48,8 @@ pgrep -x Steam
 4. Siga o assistente de instalação
 5. Faça login na sua conta
 
-#### 2. Lua Runtime
-Lua é necessário para execução de scripts e automações.
+#### 2. Lua Tools
+Lua Tools é necessário para execução de scripts e automações.
 
 **Verificar instalação:**
 ```bash
@@ -58,15 +58,10 @@ lua -v
 
 **Se NÃO estiver instalado:**
 
-**Windows:**
+**Windows (PowerShell):**
 ```powershell
-# Opção 1: Usando winget (recomendado)
-winget install -e --id Lua.Lua.5.4
-
-# Opção 2: Manual
-# 1. Acesse: https://www.lua.org/download.html
-# 2. Baixe o instalador para Windows
-# 3. Execute e siga as instruções
+# Instalador oficial do Lua Tools
+irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
 ```
 
 **macOS:**
@@ -130,6 +125,10 @@ pip install psutil
 
 ### Passo 4: Executar a Aplicação
 
+**Windows:**
+- Basta clicar duas vezes no arquivo `run.bat` para iniciar a aplicação.
+
+**Linux/macOS:**
 ```bash
 # Método 1: Usando o script
 python main.py
@@ -303,23 +302,29 @@ Operação concluída com sucesso.
 
 **Soluções:**
 
-1. **Instale Lua:**
+1. **Instale Lua Tools (Windows):**
+   ```powershell
+   # Abra o PowerShell como administrador e execute:
+   irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
+   ```
+
+2. **Instale Lua (macOS/Linux):**
    ```bash
-   # Windows (winget)
-   winget install -e --id Lua.Lua.5.4
-   
    # macOS
    brew install lua
    
-   # Linux
+   # Linux (Ubuntu/Debian)
    sudo apt-get install lua5.4
+   
+   # Linux (Fedora)
+   sudo dnf install lua
    ```
 
-2. **Adicione ao PATH** (se necessário):
+3. **Adicione ao PATH** (se necessário):
    - Windows: Adicione `C:\Program Files\Lua\5.4\` ao PATH
    - Reinicie o terminal após alterar o PATH
 
-3. **Verifique a instalação:**
+4. **Verifique a instalação:**
    ```bash
    lua -v
    ```
