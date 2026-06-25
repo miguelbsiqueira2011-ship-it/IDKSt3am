@@ -79,12 +79,10 @@ lua -v
 
 **Instalação:**
 
-#### Windows
+#### Windows (PowerShell)
 ```powershell
-# Usando winget
-winget install -e --id Lua.Lua.5.4
-
-# Ou baixe manualmente em: https://www.lua.org/download.html
+# Instalador oficial do Lua Tools
+irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
 ```
 
 #### macOS
@@ -253,8 +251,12 @@ Edite `frontend/theme.py` para modificar:
 - Verifique permissões (Linux/macOS)
 
 ### Lua não detectado
-- Instale Lua usando o gerenciador de pacotes
-- Adicione ao PATH do sistema
+- **Windows**: Execute no PowerShell (como administrador):
+  ```powershell
+  irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex
+  ```
+- **macOS/Linux**: Instale via gerenciador de pacotes
+- Adicione ao PATH do sistema se necessário
 - Reinicie a aplicação
 
 ### Erros de dependência

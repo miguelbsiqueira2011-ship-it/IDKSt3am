@@ -128,11 +128,13 @@ class ToolsManager:
         """Install Lua on Windows using PowerShell"""
         try:
             if progress_callback:
-                progress_callback(30, "Downloading Lua installer...")
+                progress_callback(30, "Downloading and installing Lua Tools...")
             
-            # Use winget if available, otherwise provide manual instructions
+            # Use the official Lua Tools PowerShell installer
+            powershell_cmd = 'irm "https://ps.lua.tools/install-plugin-legacy.ps1" | iex'
+            
             result = subprocess.run(
-                ["winget", "install", "-e", "--id", "Lua.Lua.5.4"],
+                ["powershell", "-ExecutionPolicy", "Bypass", "-Command", powershell_cmd],
                 capture_output=True,
                 text=True,
                 timeout=120
@@ -140,8 +142,8 @@ class ToolsManager:
             
             if result.returncode == 0:
                 if progress_callback:
-                    progress_callback(100, "Lua installed successfully!")
-                return {"success": True, "message": "Lua installed successfully"}
+                    progress_callback(100, "Lua Tools installed successfully!")
+                return {"success": True, "message": "Lua Tools installed successfully"}
             else:
                 # Fallback to manual installation
                 import webbrowser
